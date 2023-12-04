@@ -20,7 +20,7 @@ class TestRoutes(TestCase):
             text='Текст',
             slug='note-slug',
             author=cls.author
-            )
+        )
         cls.user = User.objects.create(username='Мимо Крокодил')
         cls.auth_client = Client()
         cls.auth_client.force_login(cls.user)

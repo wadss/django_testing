@@ -20,13 +20,15 @@ class TestNoteCreation(TestCase):
         cls.user = User.objects.create(username='Мимо Крокодил')
         cls.author_client = Client()
         cls.author_client.force_login(cls.author)
-        cls.form_data = {'title': 'Новый аголовок', 'text': 'Текст новыой заметки', 'slug': 'note-slug-new'}
+        cls.form_data = {'title': 'Новый аголовок',
+                         'text': 'Текст новыой заметки',
+                         'slug': 'note-slug-new'}
         cls.note = cls.note = Note.objects.create(
             title='Заголовок',
             text='Текст',
             slug='note-slug',
             author=cls.author
-            )
+        )
 
     def test_user_can_create_note(self):
         url = reverse(self.NOTE_ADD)
@@ -51,7 +53,10 @@ class TestNoteCreation(TestCase):
         url = reverse(self.NOTE_ADD)
         self.form_data['slug'] = self.note.slug
         response = self.author_client.post(url, data=self.form_data)
-        self.assertFormError(response, 'form', 'slug', errors=(self.note.slug + WARNING))
+        self.assertFormError(response,
+                             'form',
+                             'slug',
+                             errors=(self.note.slug + WARNING))
         self.assertEqual(Note.objects.count(), 1)
 
     def test_empty_slug(self):

@@ -18,7 +18,7 @@ class TestHomePage(TestCase):
             text='Текст',
             slug='note-slug',
             author=cls.author
-            )
+        )
         cls.auth_client = Client()
         cls.auth_client.force_login(cls.author)
 
