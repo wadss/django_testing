@@ -1,11 +1,10 @@
-import pytest
-
-from news.models import News, Comment
 from datetime import datetime, timedelta
+
+import pytest
+from django.conf import settings
 from django.urls import reverse
 from django.utils import timezone
-
-from django.conf import settings
+from news.models import Comment, News
 
 
 @pytest.fixture
@@ -19,7 +18,7 @@ def news():
 
 @pytest.fixture
 def news_id(news):
-    return news.id,
+    return (news.id,)
 
 
 @pytest.fixture
@@ -45,7 +44,7 @@ def comment(author, news):
 
 @pytest.fixture
 def comment_id(comment):
-    return comment.id,
+    return (comment.id,)
 
 
 @pytest.fixture
@@ -60,7 +59,6 @@ def all_news():
         for index in range(settings.NEWS_COUNT_ON_HOME_PAGE + 1)
     ]
     News.objects.bulk_create(all_news)
-    return all_news
 
 
 @pytest.fixture
@@ -81,29 +79,20 @@ def comment_list(news, author):
 
 @pytest.fixture
 def form_data():
-    form_data = {'text': 'Текст комментария'}
+    form_data = {'text': 'Обновлённый комментарий'}
     return form_data
 
 
 @pytest.fixture
-def new_form_data():
-    new_form_data = {'text': 'Обновлённый комментарий'}
-    return new_form_data
-
-
-@pytest.fixture
 def url_to_comments(detail_url):
-    url_to_comments = detail_url + '#comments'
-    return url_to_comments
+    return detail_url + '#comments'
 
 
 @pytest.fixture
 def edit_url(comment_id):
-    edit_url = reverse('news:edit', args=comment_id)
-    return edit_url
+    return reverse('news:edit', args=comment_id)
 
 
 @pytest.fixture
 def delete_url(comment_id):
-    delete_url = reverse('news:delete', args=comment_id)
-    return delete_url
+    return reverse('news:delete', args=comment_id)

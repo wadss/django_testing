@@ -1,9 +1,8 @@
 from http import HTTPStatus
 
 from django.contrib.auth import get_user_model
-from django.test import TestCase, Client
+from django.test import Client, TestCase
 from django.urls import reverse
-
 from notes.models import Note
 
 User = get_user_model()
@@ -25,29 +24,39 @@ class TestRoutes(TestCase):
         cls.auth_client = Client()
         cls.auth_client.force_login(cls.user)
 
-    def test_pages_availability(self):
+    def test_pages_availability_for_anonymous_user(self):
+        """Тест на доступность страниц всем пользователям"""
         urls = (
-            ('notes:home', None),
-            ('users:login', None),
-            ('users:logout', None),
-            ('users:signup', None),
-            ('notes:list', self.auth_client),
-            ('notes:add', self.auth_client),
-            ('notes:success', self.auth_client)
+            ('notes:home'),
+            ('users:login'),
+            ('users:logout'),
+            ('users:signup')
+
         )
-        for name, args in urls:
-            if args is None:
-                with self.subTest(name=name):
-                    url = reverse(name)
-                    response = self.client.get(url)
-                    self.assertEqual(response.status_code, HTTPStatus.OK)
-            else:
-                with self.subTest(name=name):
-                    url = reverse(name)
-                    response = self.auth_client.get(url)
-                    self.assertEqual(response.status_code, HTTPStatus.OK)
+        for name in urls:
+            with self.subTest(name=name):
+                url = reverse(name)
+                response = self.client.get(url)
+                self.assertEqual(response.status_code, HTTPStatus.OK)
+
+    def test_auth_user_availability_pages(self):
+        """Тест на доступность страниц авторизованным пользователям"""
+        urls = (
+            ('notes:list'),
+            ('notes:add'),
+            ('notes:success')
+        )
+        for name in urls:
+            with self.subTest(name=name):
+                url = reverse(name)
+                response = self.auth_client.get(url)
+                self.assertEqual(response.status_code, HTTPStatus.OK)
 
     def test_pages_availability_for_different_users(self):
+        """
+        Тест на доступность страниц для
+        авторизованных и анонимных пользователей
+        """
         users_statuses = (
             (self.author, HTTPStatus.OK),
             (self.reader, HTTPStatus.NOT_FOUND),
@@ -66,6 +75,7 @@ class TestRoutes(TestCase):
                     self.assertEqual(response.status_code, status)
 
     def test_redirect_for_anonymous_client(self):
+        """Тест на редирект для анонимных пользователей"""
         login_url = reverse('users:login')
         urls = (
             ('notes:detail', (self.note.slug,)),
