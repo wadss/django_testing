@@ -1,6 +1,7 @@
 import pytest
 from django.conf import settings
 from django.urls import reverse
+
 from news.forms import CommentForm
 
 
@@ -8,7 +9,7 @@ from news.forms import CommentForm
 def test_news_count(all_news, client):
     """Тест проверяющий количество новостей на главной странице"""
     response = client.get(reverse('news:home'))
-    object_list = response.context.get('object_list', [])
+    object_list = response.context.get('object_list')
     news_count = len(object_list)
     assert news_count == settings.NEWS_COUNT_ON_HOME_PAGE
 
@@ -17,7 +18,7 @@ def test_news_count(all_news, client):
 def test_news_order(client):
     """Тест на проверку сортировки новостей по дате"""
     response = client.get(reverse('news:home'))
-    object_list = response.context.get('object_list', [])
+    object_list = response.context.get('object_list')
     all_dates = [news.date for news in object_list]
     sorted_dates = sorted(all_dates, reverse=True)
     assert all_dates == sorted_dates
@@ -31,8 +32,8 @@ def test_comments_order(client, detail_url, comment_list):
 
     news = response.context['news']
     all_comments = news.comment_set.all()
-    sorte_comments = (all_comments)
-    assert all_comments == sorte_comments
+    sorted_comments = sorted(all_comments, key=lambda x: x.created)
+    assert list(all_comments) == sorted_comments
 
 
 @pytest.mark.django_db
@@ -47,6 +48,5 @@ def test_authorized_client_has_form(author_client, detail_url):
     """Тест на проверку наличия формы для авторизованного пользователя"""
     response = author_client.get(detail_url)
     assert 'form' in response.context
-    if 'form' in response.context:
-        form = response.context['form']
-        assert isinstance(form, CommentForm)
+    form = response.context['form']
+    assert isinstance(form, CommentForm)

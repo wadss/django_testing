@@ -4,6 +4,7 @@ import pytest
 from django.conf import settings
 from django.urls import reverse
 from django.utils import timezone
+
 from news.models import Comment, News
 
 
@@ -79,8 +80,7 @@ def comment_list(news, author):
 
 @pytest.fixture
 def form_data():
-    form_data = {'text': 'Обновлённый комментарий'}
-    return form_data
+    return {'text': 'Обновлённый комментарий'}
 
 
 @pytest.fixture
