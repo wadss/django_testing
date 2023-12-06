@@ -118,7 +118,7 @@ class TestNoteEditDeleteAndSlug(TestCase):
         url = reverse('notes:delete', args=(self.note.slug,))
         response = self.author_client.post(url)
         self.assertRedirects(response, reverse('notes:success'))
-        self.assertLess(Note.objects.count(), all_notes)
+        self.assertEqual(Note.objects.count(), all_notes - 1)
 
     def test_other_user_cant_delete_note(self):
         """Тест на возможность удаления чужой заметки другим пользователем"""
