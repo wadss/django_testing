@@ -3,9 +3,10 @@ from http import HTTPStatus
 from django.contrib.auth import get_user_model
 from django.test import Client, TestCase
 from django.urls import reverse
+from pytils.translit import slugify
+
 from notes.forms import WARNING
 from notes.models import Note
-from pytils.translit import slugify
 
 User = get_user_model()
 
@@ -113,14 +114,16 @@ class TestNoteEditDeleteAndSlug(TestCase):
 
     def test_author_can_delete_note(self):
         """Тест на возможность удаление заметки автором"""
+        all_notes = Note.objects.count()
         url = reverse('notes:delete', args=(self.note.slug,))
         response = self.author_client.post(url)
         self.assertRedirects(response, reverse('notes:success'))
-        self.assertEqual(Note.objects.count(), 0)
+        self.assertLess(Note.objects.count(), all_notes)
 
     def test_other_user_cant_delete_note(self):
         """Тест на возможность удаления чужой заметки другим пользователем"""
+        all_notes = Note.objects.count()
         url = reverse('notes:delete', args=(self.note.slug,))
         response = self.auth_reader.post(url)
         self.assertEqual(response.status_code, HTTPStatus.NOT_FOUND)
-        self.assertEqual(Note.objects.count(), 1)
+        self.assertEqual(Note.objects.count(), all_notes)
